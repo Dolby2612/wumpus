@@ -1,0 +1,11 @@
+Player AI Specification
+-----------------------
+Our Player AI must be able to:
+1.Move in a random direction(never backwards) unless influenced by dangers or the treasure.
+2.Must be able to asses the risk in moving from a particular square if danger(s) are detected.
+3.Must be able to identify and avoid dangerous squares if given enough information about their location.
+4.If it detects the treasure or the exit then it must iterate moving into another square and then back
+  into the previous square until the treasure/exit is found.
+5.Must attempt to kill the Wumpus if it knows its location.
+6.Must be able to find its way to any given square while avoiding any known dangers and endeavouring to 
+  avoid potentially dangerous squares.
