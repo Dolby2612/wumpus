@@ -18,20 +18,80 @@ Our Player AI must be able to:
   int n - the number used to indicate a direction
   int back - the direction to choose if going backwards is nessecary
   int dangers - the number of dangerous tiles adjacent to 
-  
+  boolean adjTreasure - indicates whether or not the treasure is adjacent
+  boolean adjExit - indicates whether or not the exit is adjacent
+  boolean hasTreasure - is true after the player finds the treasure
+  boolean goBack - indicates whether or not the ai should return to their last space
+  boolean firstMove - is true for the first move only
+ 
   also the following methods need to exist
   
   int[] getCoords(int n) this will find the coordinates of the next square in the given direction(x and y returned)
   boolean canMove(int x, int y) this will check to see if the square at the given coordinates has a known threat in it
   void move(int n) this will move the player in the given direction
-  countDanger
+  int getBack(int n) returns a value for back
+  int countDanger() this will count the number of dangerous tiles in the area
+  boolean checkBack(int dangers) will determine whether or not the player needs to go back next turn
+  ? checkSpace() this will check the occupant of the space the player is currently on
   ------------------------------------------------------------------------------------------------------------
-  1.n = random number between 0 and 4
-  2.repeat until n != back
-  3.get coords(n)
-  4.canMove(x,y)
-  5.if canMove returns false return to (1.)
-  6.if canMove returns true then
-  7.if dangers <= 1 move(n)
-  8.if dangers > 1 move(back)
-  9. return to (1.)
+ [ALL CODE WILL BE IN AN OUTERMOST LOOP]
+ start outer loop
+ 
+ 
+  if goBack is true
+    move(back)
+    back = getBack()
+    checkSpace()
+    dangers = countDanger()
+    goBack = checkBack()
+    
+  if goBack is false
+  
+    start inner loop
+    
+    
+      n = random number between 1 and 4
+      
+      while firstMove = true
+        move(n)
+        back = getBack(n)
+        checkSpace()
+        dangers = countDanger()
+        goBack = checkBack()
+        firstMove = false
+      end while loop
+     
+    loop until n != back(inner loop)
+    
+  if adjTreasure
+    move(n)
+    checkSpace()
+    if not on treasure
+      back = true
+      
+  if adjExit and hasTreasure
+    move(n)
+    checkSpace()
+    if not on treasure
+      back = true
+      
+  else
+  
+    int coords[] = getCoords(n)
+    
+    if canMove(coords[0],coords[1])
+       move(n)
+       back = getBack(n)
+       checkSpace()
+       dangers = countDanger()
+       goBack = checkBack()
+ 
+ loop until canMove(coords[0],coords[1]
+ 
+ [YOU SHOULD NOW HAVE RETURNED TO THE OUTERMOST LOOP]
+  
+    
+    
+  
+  
+    
