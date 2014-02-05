@@ -9,3 +9,29 @@ Our Player AI must be able to:
 5.Must attempt to kill the Wumpus if it knows its location.
 6.Must be able to find its way to any given square while avoiding any known dangers and endeavouring to 
   avoid potentially dangerous squares.
+  
+  
+  1,2,3 and 4 pseudocode
+  --------------------
+  This code assumes the following variables exist:
+  
+  int n - the number used to indicate a direction
+  int back - the direction to choose if going backwards is nessecary
+  int dangers - the number of dangerous tiles adjacent to 
+  
+  also the following methods need to exist
+  
+  int[] getCoords(int n) this will find the coordinates of the next square in the given direction(x and y returned)
+  boolean canMove(int x, int y) this will check to see if the square at the given coordinates has a known threat in it
+  void move(int n) this will move the player in the given direction
+  countDanger
+  ------------------------------------------------------------------------------------------------------------
+  1.n = random number between 0 and 4
+  2.repeat until n != back
+  3.get coords(n)
+  4.canMove(x,y)
+  5.if canMove returns false return to (1.)
+  6.if canMove returns true then
+  7.if dangers <= 1 move(n)
+  8.if dangers > 1 move(back)
+  9. return to (1.)
