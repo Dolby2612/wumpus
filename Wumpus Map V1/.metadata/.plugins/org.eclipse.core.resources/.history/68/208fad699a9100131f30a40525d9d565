@@ -1,0 +1,48 @@
+import java.awt.Point;
+
+public class Player extends Actor
+{
+	public Player(int x, int y, int size)
+	{
+		super(x, y, size);
+	}
+	
+	public Player(Point position, int size)
+	{
+		super(position, size);
+	}
+	
+	public String getPlayerSenses(int[] triggerArray)
+	{
+		String senses = "";
+		
+		for(int i = 0; i < triggerArray.length; i ++)
+		{
+			for(int j = 0; j < triggerArray[i]; j ++)
+			{
+				if(i == 0)
+				{
+					senses += "PIT TEXT";
+				}
+				else if(i == 1)
+				{
+					senses += "You feel the fluttering of wings.\n";
+				}
+				else if(i == 2)
+				{
+					senses += "You smell an awful stench.\n";
+				}
+				else if(i == 3)
+				{
+					senses += "TREASURE TEXT";
+				}
+				else if(i == 4)
+				{
+					senses += "EXIT TEXT";
+				}
+			}
+		}
+		
+		return senses;
+	}
+}

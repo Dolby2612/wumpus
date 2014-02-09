@@ -1,0 +1,14 @@
+import java.awt.Point;
+
+public class Superbat extends Danger
+{
+	public Superbat(int x, int y)
+	{
+		super(x, y);
+	}
+	
+	public Superbat(Point position)
+	{
+		super(position);
+	}
+}

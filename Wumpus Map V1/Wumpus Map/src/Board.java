@@ -10,18 +10,18 @@ public class Board
 	public ArrayList<ArrayList<GameObject>> gameObjects;
 	public HashMap<Point, GameObject> hashMap;
 	
-	public Point playerPosition;
-	public Point wumpusPosition;
-	public Point treasurePosition;
-	public Point exitPosition;
+	public Player player;
+	public Wumpus wumpus;
+	public Treasure treasure;
+	public CaveExit caveExit;
 	
 	/*-----------------------------------------------------*/
 	//Constructor
 	
-	public Board(int totalDangers, int maxAdjacentDangers, int size)
+	public Board(int size, int totalDangers, int maxAdjacentDangers)
 	{
 		this.size = size;
-		this.totalDangers = totalDangers;
+		this.totalDangers = Math.min(totalDangers, (int) ((size * size) / 5));
 		
 		spaces = new ArrayList<ArrayList<Space>>();
 		gameObjects = new ArrayList<ArrayList<GameObject>>();
@@ -29,9 +29,9 @@ public class Board
 		
 		//Randomly assign number of Pits and Superbats
 		int currentPits = 0;
-		int totalPits = (int) (Math.random() * totalDangers + 1);
+		int totalPits = (int) (Math.random() * this.totalDangers + 1);
 		int currentBats = 0;
-		int totalBats = totalDangers - totalPits;
+		int totalBats = this.totalDangers - totalPits;
 		
 		int row, col;
 		//Create empty map
@@ -50,7 +50,7 @@ public class Board
 		
 		//Randomly fill map with Superbats and Pits
 		Point temp;
-		for(int i = 0; i < totalDangers; i ++)
+		for(int i = 0; i < this.totalDangers; i ++)
 		{
 			//Get a random point with at least the specified number of empty adjacent spaces
 			temp = getRandomEmptyPoint(4 - Math.max(0, maxAdjacentDangers));
@@ -71,17 +71,20 @@ public class Board
 		
 		//Add Player, Wumpus, Treasure, and CaveExit to map
 		//All have at least one empty space adjacent to them to allow movement
-		playerPosition = getRandomEmptyPoint(1);
-		gameObjects.get(playerPosition.y).set(playerPosition.x, new Player(playerPosition, size));
 		
-		wumpusPosition = getRandomEmptyPoint(1);
-		gameObjects.get(wumpusPosition.y).set(wumpusPosition.x, new Wumpus(wumpusPosition, size));
+		Point tempPosition;
 		
-		treasurePosition = getRandomEmptyPoint(1);
-		gameObjects.get(treasurePosition.y).set(treasurePosition.x, new Treasure(treasurePosition));
+		tempPosition = getRandomEmptyPoint(1);
+		player = new Player(tempPosition);
 		
-		exitPosition = getRandomEmptyPoint(1);
-		gameObjects.get(exitPosition.y).set(exitPosition.x, new CaveExit(exitPosition));
+		tempPosition = getRandomEmptyPoint(1);
+		wumpus = new Wumpus(tempPosition);
+		
+		tempPosition = getRandomEmptyPoint(1);
+		treasure = new Treasure(tempPosition);
+		
+		tempPosition = getRandomEmptyPoint(1);
+		caveExit = new CaveExit(tempPosition);
 		
 		//Link Spaces and GameObjects together and create HashMap
 		for(row = 0; row < size; row ++)
@@ -162,7 +165,7 @@ public class Board
 		return numSurrounding;
 	}
 	
-	private Point getRandomEmptyPoint(int emptySurroundings)
+	public Point getRandomEmptyPoint(int emptySurroundings)
 	{
 		//Get a random point on the map
 		int randX = (int) (Math.random() * size);
@@ -178,7 +181,32 @@ public class Board
 		//If not, call the method again
 		else
 		{
+			/**
+			 * The recursion here can overflow the stack if there are no
+			 * more possible spaces. The exact number of ideal possible spaces is unknown,
+			 * however the number is close to 40 for a grid of size 10 when each danger
+			 * must be surrounded by 4 empty spaces.
+			 * To prevent stack overflows, the maximum number of dangers will be limited to
+			 * 1/5 of the grid's area.
+			 */
 			return getRandomEmptyPoint(emptySurroundings);
 		}
+	}
+	
+	
+	/*-----------------------------------------------------*/
+	//Gameplay Methods
+	
+	public int[] getPlayerTriggers()
+	{
+		int[] triggerArray = new int[5];
+		
+		triggerArray[0] = getSurrounding(Pit.class, player.position);
+		triggerArray[1] = getSurrounding(Superbat.class, player.position);
+		triggerArray[2] = getSurrounding(Wumpus.class, player.position);
+		triggerArray[3] = getSurrounding(Treasure.class, player.position);
+		triggerArray[4] = getSurrounding(CaveExit.class, player.position);
+		
+		return triggerArray;
 	}
 }

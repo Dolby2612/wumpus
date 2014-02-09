@@ -1,0 +1,10 @@
+
+public class BoardInvalidException extends Exception
+{
+	private static final long serialVersionUID = 7751577543599007438L;
+
+	public BoardInvalidException(String message)
+	{
+		super(message);
+	}
+}

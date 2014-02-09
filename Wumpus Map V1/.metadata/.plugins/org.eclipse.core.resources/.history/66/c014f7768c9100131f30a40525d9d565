@@ -1,0 +1,8 @@
+
+public class BoardInvalidException extends Exception
+{
+	public BoardInvalidException(String message)
+	{
+		super(message);
+	}
+}
