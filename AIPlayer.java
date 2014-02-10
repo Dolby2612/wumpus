@@ -35,7 +35,8 @@ public class AIPlayer extends Player
 				
 				if(destX != posX)
 				{
-					
+					//these conditionals determine which direction to move in
+					//east
 					if(destX > posX)
 					{
 						if(canMove(EAST))
@@ -44,6 +45,7 @@ public class AIPlayer extends Player
 							canX = true;
 						}
 					}
+					//west
 					if(destX < posX)
 					{
 						if(canMove(WEST));
@@ -58,7 +60,8 @@ public class AIPlayer extends Player
 						if(canMove(NORTH))
 						{
 							move(NORTH);
-							canX = true;
+							canX = true; //this is not a mistake, it is designed so that
+								     //the AI doesn;t move along the y axis again
 						}
 						else
 						{
@@ -73,6 +76,7 @@ public class AIPlayer extends Player
 				
 				if(destY != posY && !canX)
 				{
+					//south
 					if(destY > posY)
 					{
 						if(canMove(SOUTH)
@@ -81,6 +85,7 @@ public class AIPlayer extends Player
 							canY = true;
 						}
 					}
+					//north
 					if(destY < posY)
 					{
 						if(canMove(NORTH))
@@ -94,7 +99,7 @@ public class AIPlayer extends Player
 					{
 						if(canMove(NORTH))
 						{
-							move(NORTH);
+							move(NORTH);//again, feature, not error
 							canY = true;
 						}
 						if(canMove(SOUTH))
@@ -104,6 +109,7 @@ public class AIPlayer extends Player
 						}
 					}
 				}
+				//we might want to throw an exception if canX and canY are false
 			}
 			if(adjTreasure)
 			{
