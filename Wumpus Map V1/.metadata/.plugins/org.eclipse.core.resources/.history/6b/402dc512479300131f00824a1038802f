@@ -1,0 +1,16 @@
+import java.awt.Point;
+
+
+public class AI extends Player {
+
+	public AI(int x, int y) {
+		super(x, y);
+		// TODO Auto-generated constructor stub
+	}
+
+	public AI(Point position) {
+		super(position);
+		// TODO Auto-generated constructor stub
+	}
+
+}

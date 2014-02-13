@@ -3,7 +3,6 @@ import java.awt.Point;
 public class GameObject
 {
 	//access GUI?
-	public Space space;
 	
 	public Point position;
 	
@@ -15,11 +14,5 @@ public class GameObject
 	public GameObject(Point position)
 	{
 		this.position = position;
-	}
-	
-	public void link(Space linkedSpace)
-	{
-		this.space = linkedSpace;
-		this.space.occupant = this;
 	}
 }

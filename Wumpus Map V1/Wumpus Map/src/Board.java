@@ -1,201 +1,160 @@
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
 
 public class Board
 {
+	public static final Point NORTH = new Point(0, -1);
+	public static final Point SOUTH = new Point(0, 1);
+	public static final Point EAST = new Point(1, 0);
+	public static final Point WEST = new Point(-1, 0);
+	public static final Point[] DIRECTIONS = {NORTH, SOUTH, EAST, WEST};
+	
+	public static final String PLAYING = "playing";
+	public static final String WIN = "win";
+	public static final String LOSE = "lose";
+	
 	public int size;
-	public int totalDangers;
-	public ArrayList<ArrayList<Space>> spaces;
-	public ArrayList<ArrayList<GameObject>> gameObjects;
-	public HashMap<Point, GameObject> hashMap;
+	
+	public HashMap<Point, GameObject> gameObjects;
+	public ArrayList<Point> emptyPoints;
 	
 	public Player player;
 	public Wumpus wumpus;
 	public Treasure treasure;
 	public CaveExit caveExit;
 	
-	/*-----------------------------------------------------*/
-	//Constructor
-	
-	public Board(int size, int totalDangers, int maxAdjacentDangers)
+	public Board(int size, int totalDangers, int minFreeSpaceAroundDangers)
 	{
 		this.size = size;
-		this.totalDangers = Math.min(totalDangers, (int) ((size * size) / 5));
 		
-		spaces = new ArrayList<ArrayList<Space>>();
-		gameObjects = new ArrayList<ArrayList<GameObject>>();
-		hashMap = new HashMap<Point, GameObject>();
+		gameObjects = new HashMap<Point, GameObject>();
+		emptyPoints = new ArrayList<Point>();
 		
-		//Randomly assign number of Pits and Superbats
+		Point tempPoint;
+		
 		int currentPits = 0;
-		int totalPits = (int) (Math.random() * this.totalDangers + 1);
+		int totalPits = (int) (Math.random() * totalDangers + 1);
 		int currentBats = 0;
-		int totalBats = this.totalDangers - totalPits;
+		int totalBats = totalDangers - totalPits;
 		
-		int row, col;
-		//Create empty map
-		for(row = 0; row < size; row ++)
+		for(int x = 0; x < size; x ++)
 		{
-			spaces.add(new ArrayList<Space>());
-			gameObjects.add(new ArrayList<GameObject>());
-			
-			for(col = 0; col < size; col ++)
+			for(int y = 0; y < size; y ++)
 			{
-				//Fill map with Space and Empty objects
-				spaces.get(row).add(new Space(col, row));
-				gameObjects.get(row).add(new Empty(col, row));
+				tempPoint = new Point(x, y);
+				gameObjects.put(tempPoint, new Empty(tempPoint));
+				emptyPoints.add(tempPoint);
 			}
 		}
 		
-		//Randomly fill map with Superbats and Pits
-		Point temp;
-		for(int i = 0; i < this.totalDangers; i ++)
+		try
 		{
-			//Get a random point with at least the specified number of empty adjacent spaces
-			temp = getRandomEmptyPoint(4 - Math.max(0, maxAdjacentDangers));
-			
-			//Check if enough Pits have already been placed
-			if(currentPits < totalPits)
+			while(currentPits < totalPits)
 			{
+				tempPoint = getRandomEmptyPoint(minFreeSpaceAroundDangers);
+				
+				gameObjects.remove(tempPoint);
+				gameObjects.put(tempPoint, new Pit(tempPoint));
+				
+				//emptyPoints.remove(tempPoint.x * size + tempPoint.y);
+				
 				currentPits ++;
-				gameObjects.get(temp.y).set(temp.x, new Pit(temp));
 			}
-			//Check if enough Superbats have already been placed
-			else if(currentBats < totalBats)
+			
+			while(currentBats < totalBats)
 			{
+				tempPoint = getRandomEmptyPoint(minFreeSpaceAroundDangers);
+				
+				gameObjects.remove(tempPoint);
+				gameObjects.put(tempPoint, new Superbat(tempPoint));
+				
+				//emptyPoints.remove(tempPoint.x * size + tempPoint.y);
+				
 				currentBats ++;
-				gameObjects.get(temp.y).set(temp.x, new Superbat(temp));
 			}
+			
+			player = new Player(getRandomEmptyPoint(1));
+			
+			wumpus = new Wumpus(getRandomEmptyPoint(1));
+			
+			treasure = new Treasure(getRandomEmptyPoint(1));
+			gameObjects.remove(treasure.position);
+			gameObjects.put(treasure.position, treasure);
+			
+			caveExit = new CaveExit(getRandomEmptyPoint(1));
+			gameObjects.remove(caveExit.position);
+			gameObjects.put(caveExit.position, caveExit);
 		}
-		
-		//Add Player, Wumpus, Treasure, and CaveExit to map
-		//All have at least one empty space adjacent to them to allow movement
-		
-		Point tempPosition;
-		
-		tempPosition = getRandomEmptyPoint(1);
-		player = new Player(tempPosition);
-		
-		tempPosition = getRandomEmptyPoint(1);
-		wumpus = new Wumpus(tempPosition);
-		
-		tempPosition = getRandomEmptyPoint(1);
-		treasure = new Treasure(tempPosition);
-		
-		tempPosition = getRandomEmptyPoint(1);
-		caveExit = new CaveExit(tempPosition);
-		
-		//Link Spaces and GameObjects together and create HashMap
-		for(row = 0; row < size; row ++)
+		catch(BoardInvalidException e)
 		{
-			for(col = 0; col < size; col ++)
-			{
-				//Link each Space with the GameObject that shares its position
-				getSpace(col, row).link(getGameObject(col, row));
-				//Add each GameObject to the HashMap
-				hashMap.put(new Point(col, row), getGameObject(col, row));
-			}
+			System.out.print("Board is invalid, terminating program.");
+			System.exit(0);
 		}
 	}
 	
-	
-	/*-----------------------------------------------------*/
-	//Map access methods
-	
-	public Space getSpace(int x, int y)
+	public GameObject getGameObject(Point position)
 	{
-		return spaces.get(y).get(x);
+		return gameObjects.get(position);
 	}
 	
-	public Space getSpace(Point p)
+	public Point addPoints(Point p1, Point p2)
 	{
-		return getSpace(p.x, p.y);
+		return new Point(p1.x + p2.x, p1.y + p2.y);
 	}
-	
-	public GameObject getGameObject(int x, int y)
-	{
-		return gameObjects.get(y).get(x);
-	}
-	
-	public GameObject getGameObject(Point p)
-	{
-		return getGameObject(p.x, p.y);
-	}
-	
-	public GameObject getGameObjectFromHash(Point p)
-	{
-		return hashMap.get(p);
-	}
-	
-	public GameObject getGameObjectFromHash(int x, int y)
-	{
-		return getGameObjectFromHash(new Point(x, y));
-	}
-	
-	
-	/*-----------------------------------------------------*/
-	//Utility methods
 	
 	public boolean isOccupant(Class<?> desiredOccupant, Point position)
 	{
-		return desiredOccupant.isInstance(getGameObject(position));
+		return desiredOccupant.isInstance(gameObjects.get(position));
 	}
 	
-	public int getSurrounding(Class<?> adjacentObject, Point position)
+	public int getSurrounding(Class<?> C, Point position)
 	{
-		int numSurrounding = 0;
+		int count = 0;
 		
-		Point[] directions = {Actor.NORTH, Actor.SOUTH, Actor.EAST, Actor.WEST};
-		int tempX, tempY;
-		for(int i = 0; i < directions.length; i ++)
+		for(Point currentPoint : DIRECTIONS)
 		{
-			//Wrap surrounding points around the edges of the map, i.e position 10 = 0, 11 = 1, etc.
-			tempX = (position.x + size + directions[i].x) % size;
-			tempY = (position.y + size + directions[i].y) % size;
-			
-			//Check that the current adjacent GameObject is a member of class adjacentObject
-			//and increment numSurrounding if so
-			if(isOccupant(adjacentObject, new Point(tempX, tempY)))
+			if(C.isInstance(gameObjects.get(addPoints(position, currentPoint))))
 			{
-				numSurrounding ++;
+				count ++;
+			}
+			else if(wumpus != null && position.equals(wumpus.position))
+			{
+				count ++;
 			}
 		}
 		
-		return numSurrounding;
+		return count;
 	}
 	
-	public Point getRandomEmptyPoint(int emptySurroundings)
+	public Point getRandomEmptyPoint(int minFreeSpaceAround) throws BoardInvalidException
 	{
-		//Get a random point on the map
-		int randX = (int) (Math.random() * size);
-		int randY = (int) (Math.random() * size);
-		Point randPoint = new Point(randX, randY);
+		ArrayList<GameObject> shuffledGameObjects = new ArrayList<GameObject>(gameObjects.values());
+		Collections.shuffle(shuffledGameObjects);
 		
-		//If the point is Empty and surrounded by no less than
-		//emptySurroundings adjacent Empty spaces then return that point
-		if(isOccupant(Empty.class, randPoint) && getSurrounding(Empty.class, randPoint) >= emptySurroundings)
+		int i = 0;
+		GameObject tempRandomObject;
+		
+		do
 		{
-			return randPoint;
+			tempRandomObject = shuffledGameObjects.get(i);
+			
+			if(tempRandomObject instanceof Empty)
+			{
+				if(getSurrounding(Empty.class, tempRandomObject.position) >= minFreeSpaceAround)
+				{
+					return tempRandomObject.position;
+				}
+			}
+			
+			i ++;
 		}
-		//If not, call the method again
-		else
-		{
-			/**
-			 * The recursion here can overflow the stack if there are no
-			 * more possible spaces. The exact number of ideal possible spaces is unknown,
-			 * however the number is close to 40 for a grid of size 10 when each danger
-			 * must be surrounded by 4 empty spaces.
-			 * To prevent stack overflows, the maximum number of dangers will be limited to
-			 * 1/5 of the grid's area.
-			 */
-			return getRandomEmptyPoint(emptySurroundings);
-		}
+		while(i < shuffledGameObjects.size());
+		
+		throw new BoardInvalidException("No more legal points on map.");
 	}
-	
-	
-	/*-----------------------------------------------------*/
-	//Gameplay Methods
 	
 	public int[] getPlayerTriggers()
 	{
@@ -208,5 +167,49 @@ public class Board
 		triggerArray[4] = getSurrounding(CaveExit.class, player.position);
 		
 		return triggerArray;
+	}
+	
+	public String checkPlayerStatus()
+	{
+		GameObject standingOn = getGameObject(player.position);
+		
+		if(standingOn instanceof Pit)
+		{
+			return LOSE;
+		}
+		else if(standingOn instanceof Superbat)
+		{
+			try
+			{
+				player.position = getRandomEmptyPoint(1);
+			}
+			catch(BoardInvalidException e)
+			{
+				//do nothing?
+			}
+		}
+		else if(standingOn instanceof Treasure)
+		{
+			player.hasTreasure = true;
+		}
+		else if(standingOn instanceof CaveExit)
+		{
+			if(player.hasTreasure)
+			{
+				return WIN;
+			}
+		}
+		else if(player.position.equals(wumpus.position))
+		{
+			return LOSE;
+		}
+		
+		return PLAYING;
+	}
+	
+	public void link()
+	{
+		player.board = this;
+		wumpus.board = this;
 	}
 }

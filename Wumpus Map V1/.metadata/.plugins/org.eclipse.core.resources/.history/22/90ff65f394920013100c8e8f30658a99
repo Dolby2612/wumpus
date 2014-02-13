@@ -1,0 +1,80 @@
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+
+public class Board2
+{
+	public int size;
+	
+	public HashMap<Point, GameObject> gameObjects;
+	public ArrayList<Point> emptyPoints;
+	
+	public Player player;
+	public Wumpus wumpus;
+	public Treasure treasure;
+	public CaveExit caveExit;
+	
+	public Board2(int size, int totalDangers, int minFreeSpaceAroundDangers)
+	{
+		this.size = size;
+		
+		gameObjects = new HashMap<Point, GameObject>();
+		emptyPoints = new ArrayList<Point>();
+		
+		//Randomly distribute Pits and Superbats across the cave
+		Point tempPoint;
+		
+		int currentPits = 0;
+		int totalPits = (int) (Math.random() * totalDangers + 1);
+		
+		while(currentPits < totalPits)
+		{
+			currentPits ++;
+			tempPoint = getRandomEmptyPoint(minFreeSpaceAroundDangers);
+			gameObjects.put(tempPoint, new Pit(tempPoint));
+		}
+		
+		int currentBats = 0;
+		int totalBats = totalDangers - totalPits;
+		
+		while(currentBats < totalBats)
+		{
+			currentBats ++;
+			tempPoint = getRandomEmptyPoint(minFreeSpaceAroundDangers);
+			gameObjects.put(tempPoint, new Superbat(tempPoint));
+		}
+		
+		//Add Player, Wumpus, Treasure, and CaveExit to the cave
+		player = new Player(getRandomEmptyPoint(1));
+		wumpus = new Wumpus(getRandomEmptyPoint(1));
+		//Since treasure and caveExit never move, they can be safely added to the gameObjects map
+		treasure = new Treasure(getRandomEmptyPoint(1));
+		gameObjects.put(treasure.position, treasure);
+		caveExit = new CaveExit(getRandomEmptyPoint(1));
+		gameObjects.put(caveExit.position, caveExit);
+		
+		//Fill rest of cave with empty spaces
+		for(int x = 0; x < size; x ++)
+		{
+			for(int y = 0; y < size; y ++)
+			{
+				if(gameObjects.get(new Point(x, y)) != null)
+				{
+					
+				}
+			}
+		}
+	}
+	
+	public Point getRandomEmptyPoint(int minFreeSpaceAround)
+	{
+		return null;
+	}
+	
+	public void link()
+	{
+		player.board = this;
+		wumpus.board = this;
+	}
+}

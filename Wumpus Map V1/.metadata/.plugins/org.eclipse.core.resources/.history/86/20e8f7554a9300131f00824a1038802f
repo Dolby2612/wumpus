@@ -1,0 +1,82 @@
+import java.awt.Point;
+
+
+public class Main
+{
+
+	public static void main(String[] args)
+	{
+		Board gameBoard = new Board(10, 20, 4);
+		gameBoard.link();
+		
+		AI ai = new AI(gameBoard.player.position)
+		gameBoard.player = ai;
+		
+		String playerStatus;
+		
+		do
+		{
+			ai.act();
+			playerStatus = gameBoard.checkPlayerStatus();
+		}
+		while(playerStatus.equals(Board.PLAYING));
+		
+		printMap(gameBoard);
+	}
+	
+	public static void printMap(Board b)
+	{
+		Point tempPoint;
+		GameObject tempObject;
+		
+		for(int y = 0; y < b.size; y ++)
+		{
+			for(int x = 0; x < b.size; x ++)
+			{
+				tempPoint = new Point(x, y);
+				
+				if(tempPoint.equals(b.player.position))
+				{
+					System.out.print("P");
+				}
+				else if(tempPoint.equals(b.wumpus.position))
+				{
+					System.out.print("W");
+				}
+				else
+				{
+					tempObject = b.getGameObject(tempPoint);
+					
+					if(tempObject instanceof Empty)
+					{
+						System.out.print(" ");
+					}
+					else if(tempObject instanceof Pit)
+					{
+						System.out.print("O");
+					}
+					else if(tempObject instanceof Superbat)
+					{
+						System.out.print("B");
+					}
+					else if(tempObject instanceof Treasure)
+					{
+						if(!b.player.hasTreasure)
+						{	
+							System.out.print("T");
+						}
+					}
+					else if(tempObject instanceof CaveExit)
+					{
+						System.out.print("E");
+					}
+				}
+				
+				System.out.print(" | ");
+			}
+			
+			System.out.print("\n---------------------------------------\n");
+		}
+	}
+
+}

@@ -1,0 +1,14 @@
+import java.awt.Point;
+
+public class AI extends Player
+{
+	public AI(int x, int y)
+	{
+		super(x, y);
+	}
+
+	public AI(Point position)
+	{
+		super(position);
+	}
+}

@@ -1,120 +1,66 @@
 import java.awt.Point;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class Main
 {
+
 	public static void main(String[] args)
 	{
-		Board gameBoard = new Board(10, 20, 0);
-		gameBoard.player.board = gameBoard;
+		Board gameBoard = new Board(10, 20, 4);
 		
-		GameObject currentGameObject;
-		Player player = gameBoard.player;
-		String input;
+		AI ai = new AI(gameBoard.player.position);
+		gameBoard.player = ai;
 		
-		boolean playing = true;
-		while(playing)
-		{
-			printMap(gameBoard);
-			
-			System.out.println(player.getPlayerSenses(gameBoard.getPlayerTriggers()));
-			
-			input = EasyIn.getString();
-			
-			if(input.toLowerCase().equals("n"))
-			{
-				player.move(Actor.NORTH);
-			}
-			else if(input.toLowerCase().equals("s"))
-			{
-				player.move(Actor.SOUTH);
-			}
-			else if(input.toLowerCase().equals("e"))
-			{
-				player.move(Actor.EAST);
-			}
-			else if(input.toLowerCase().equals("w"))
-			{
-				player.move(Actor.WEST);
-			}
-			
-			currentGameObject = gameBoard.getGameObjectFromHash(player.position);
-			
-			if(currentGameObject instanceof Pit)
-			{
-				System.out.println("You fell down a pit and died.");
-				
-				playing = false;
-			}
-			else if(currentGameObject instanceof Superbat)
-			{
-				System.out.println("A giant bat carried you off somewhere.");
-				
-				player.position = gameBoard.getRandomEmptyPoint(1);
-			}
-			
-			if(player.position.equals(gameBoard.wumpus.position))
-			{
-				System.out.println("The Wumpus killed you.");
-				
-				playing = false;
-			}
-			else if(player.position.equals(gameBoard.treasure.position) && !player.hasTreasure)
-			{
-				System.out.println("You picked up some phat l00t.");
-				
-				player.hasTreasure = true;
-			}
-			else if(player.position.equals(gameBoard.caveExit.position))
-			{
-				if(player.hasTreasure)
+		gameBoard.link();
+		
+		String playerStatus;
+		
+		printMap(gameBoard);
+		
+		Timer timer = new Timer();
+		
+		timer.schedule(new TimerTask() {
+			@Override
+			  public void run(){
+				if(playerStatus.equals(Board.PLAYING))
 				{
-					System.out.println("You escaped with the treasure!");
-					
-					playing = false;
+					ai.act();
+					playerStatus = gameBoard.checkPlayerStatus();
+					printMap(gameBoard);
 				}
-				else
-				{
-					System.out.println("You found the cave exit, but you cannot leave without the treasure.");
-				}
-			}
-		}
+			  }
+		}, new Date(), 1000);
+		//THIS IS BROKEN AS FUCK
+
 	}
 	
 	public static void printMap(Board b)
 	{
-		for(int k = 0; k < 50; k ++)
-		{
-			System.out.println();
-		}
+		clear();
 		
 		Point tempPoint;
 		GameObject tempObject;
 		
-		for(int i = 0; i < b.gameObjects.size(); i ++)
+		for(int y = 0; y < b.size; y ++)
 		{
-			for(int j = 0; j < b.gameObjects.get(i).size(); j ++)
+			for(int x = 0; x < b.size; x ++)
 			{
-				tempPoint = new Point(j, i);
+				tempPoint = new Point(x, y);
 				
-				if(b.player.position.equals(tempPoint))
+				if(tempPoint.equals(b.player.position))
 				{
 					System.out.print("P");
 				}
-				else if(b.wumpus.position.equals(tempPoint))
+				else if(tempPoint.equals(b.wumpus.position))
 				{
 					System.out.print("W");
 				}
-				else if(b.treasure.position.equals(tempPoint))
-				{
-					System.out.print("T");
-				}
-				else if(b.caveExit.position.equals(tempPoint))
-				{
-					System.out.print("E");
-				}
 				else
 				{
-					tempObject = b.getGameObjectFromHash(tempPoint);
+					tempObject = b.getGameObject(tempPoint);
 					
 					if(tempObject instanceof Empty)
 					{
@@ -128,6 +74,21 @@ public class Main
 					{
 						System.out.print("B");
 					}
+					else if(tempObject instanceof Treasure)
+					{
+						if(!b.player.hasTreasure)
+						{	
+							System.out.print("T");
+						}
+						else
+						{
+							System.out.print(" ");
+						}
+					}
+					else if(tempObject instanceof CaveExit)
+					{
+						System.out.print("E");
+					}
 				}
 				
 				System.out.print(" | ");
@@ -136,4 +97,13 @@ public class Main
 			System.out.print("\n---------------------------------------\n");
 		}
 	}
+	
+	public static void clear()
+	{
+		for(int c = 0; c < 50; c ++)
+		{
+			System.out.println();
+		}
+	}
+
 }

@@ -1,3 +1,5 @@
+//TODO: Add arrow shooting and Wumpus movement
+
 import java.awt.Point;
 
 public class Player extends Actor
@@ -16,7 +18,12 @@ public class Player extends Actor
 		this.hasTreasure = false;
 	}
 	
-	public String getPlayerSenses(int[] triggerArray)
+	public void move(Point direction)
+	{
+		super.move(direction);
+	}
+	
+	public String getSenses(int[] triggerArray)
 	{
 		String senses = "";
 		
@@ -26,7 +33,7 @@ public class Player extends Actor
 			{
 				if(i == 0)
 				{
-					senses += "You hear an echo from far below you.\n";
+					senses += "You feel a slight breeze.\n";
 				}
 				else if(i == 1)
 				{
@@ -48,15 +55,5 @@ public class Player extends Actor
 		}
 		
 		return senses;
-	}
-	
-	public void move(Point direction)
-	{
-		super.move(direction);
-		
-		if(hasTreasure)
-		{
-			board.treasure.position = position;
-		}
 	}
 }
