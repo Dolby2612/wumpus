@@ -1,0 +1,35 @@
+Hunt The Wumpus Report
+//Delete all 'comments' before submitting
+//this will need to be formatted and made to look 'pretty' in the final report
+History
+In the early seventies(1) Gregory Yobb discovered the People's Computer
+Company and after seeing a selection of their games he found himself
+disappointed that each game he saw used a 10x10 grid(2). This
+disappointment inspired Yobb to create a game that was not based on a
+grid but was instead a twisting series of caves. Thus, Hunt The Wumpus 
+was born. Hunt The Wumpus became very popular very quickly(1) and even
+today it has been remade in both its original text-based form and
+graphical forms many times and it has even been remade for mobile devices
+and now our task is to remake the game once more for our first project.
+
+Design
+//Dan & Matt's design elements need to be explained first
+When designing the AI we decided that it had to meet the following criteria:
+1.It had to move in a random direction unless it had information about nearby danger or treasure
+2.It had to asses the risk in moving from a given square based on the number of surrounding dangers
+3.It had to endeavour to find the treasure and the exit when they were adjacent
+
+we met the first criteria by simply adding a line of code that would make the AI pick a random direction
+and then move in that direction but only if there was no other information that would effect how it moved.
+The second was met by counting the number of dangerous squares adjacent to the AI and if there were two or more the 
+AI was told to move back on its next turn. If less than two dangers were found then the AI would move in a 
+random direction. The third criteria was met by making the AI move into a random square after dfiscovering the 
+treasure was nearby. If the chosen square did not have the treasure then the AI was told to go back where it 
+would try again(this is assuming of course that there was nothing dangerous in that particular square).
+
+//bracketed numbers need to be turned into superscript and footnotes
+
+Bibliography
+//All other text goes above this, this should be the last thing in the document.
+(1)http://www.trs-80.org/hunt-the-wumpus/ 13/02/14
+(2)http://www.atariarchives.org/bcc1/showpage.php?page=247 13/02/14
