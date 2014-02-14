@@ -1,0 +1,64 @@
+//TODO: Add arrow shooting and Wumpus movement
+
+import java.awt.Point;
+
+public class Player extends Actor
+{
+	public boolean hasTreasure;
+	
+	public Player(int x, int y)
+	{
+		super(x, y);
+		this.hasTreasure = false;
+	}
+	
+	public Player(Point position)
+	{
+		super(position);
+		this.hasTreasure = false;
+	}
+	
+	public void shoot(Point direction, int range)
+	{
+		Point passing = 
+		
+		for(int r = 0; r < range; ++)
+		{
+			
+		}
+	}
+	
+	public String getSenses(int[] triggerArray)
+	{
+		String senses = "";
+		
+		for(int i = 0; i < triggerArray.length; i ++)
+		{
+			for(int j = 0; j < triggerArray[i]; j ++)
+			{
+				if(i == 0)
+				{
+					senses += "You feel a slight breeze.\n";
+				}
+				else if(i == 1)
+				{
+					senses += "You feel the fluttering of wings.\n";
+				}
+				else if(i == 2)
+				{
+					senses += "You smell an awful stench.\n";
+				}
+				else if(i == 3)
+				{
+					senses += "You see a faint glittering of gold.\n";
+				}
+				else if(i == 4)
+				{
+					senses += "You feel a draft from outside.\n";
+				}
+			}
+		}
+		
+		return senses;
+	}
+}

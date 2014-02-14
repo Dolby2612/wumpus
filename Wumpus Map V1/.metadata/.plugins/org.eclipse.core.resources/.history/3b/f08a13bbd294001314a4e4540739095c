@@ -1,0 +1,16 @@
+import java.awt.Point;
+
+public class GameObject
+{
+	public Point2 position;
+	
+	public GameObject(int x, int y)
+	{
+		this.position = new Point2(x, y);
+	}
+	
+	public GameObject(Point2 position)
+	{
+		this.position = position;
+	}
+}

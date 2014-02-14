@@ -13,8 +13,10 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="System.out" key="selection"/>
+		<item value="subtract" key="selection"/>
 		<list key="findhistory">
+			<item value="subtract"/>
+			<item value="remov"/>
 			<item value="system.out"/>
 			<item value="totalDangers"/>
 			<item value="totalDanger"/>

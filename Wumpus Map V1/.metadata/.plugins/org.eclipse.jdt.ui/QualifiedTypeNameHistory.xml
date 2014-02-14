@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="java.util.HashMap"/>
-<fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="java.util.Collections"/>
-<fullyQualifiedTypeName name="java.awt.Point"/>
 <fullyQualifiedTypeName name="java.lang.Math"/>
 <fullyQualifiedTypeName name="java.util.Timer"/>
 <fullyQualifiedTypeName name="java.util.TimerTask"/>
 <fullyQualifiedTypeName name="java.sql.Date"/>
 <fullyQualifiedTypeName name="java.util.Date"/>
+<fullyQualifiedTypeName name="org.apache.commons.lang3.time.StopWatch"/>
+<fullyQualifiedTypeName name="java.awt.Point"/>
+<fullyQualifiedTypeName name="java.util.HashMap"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="Board"/>
 </qualifiedTypeNameHistroy>

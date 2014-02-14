@@ -16,7 +16,6 @@ public class Actor extends GameObject
 	
 	public void move(Point direction)
 	{
-		position.x = (position.x + board.size + direction.x) % board.size;
-		position.y = (position.y + board.size + direction.y) % board.size;
+		position = board.addPoints(position, direction);
 	}
 }

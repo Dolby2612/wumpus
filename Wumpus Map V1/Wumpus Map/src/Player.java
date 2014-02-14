@@ -18,9 +18,24 @@ public class Player extends Actor
 		this.hasTreasure = false;
 	}
 	
-	public void move(Point direction)
+	public void shoot(Point direction, int range)
 	{
-		super.move(direction);
+		Point passing = position;
+		
+		for(int r = 0; r < range; r ++)
+		{
+			passing = board.addPoints(passing, direction);
+			
+			if(board.isOccupant(Wumpus.class, passing))
+			{
+				board.wumpus.alive = false;
+			}
+		}
+		
+		if(board.wumpus.alive)
+		{
+			board.moveWumpus();
+		}
 	}
 	
 	public String getSenses(int[] triggerArray)

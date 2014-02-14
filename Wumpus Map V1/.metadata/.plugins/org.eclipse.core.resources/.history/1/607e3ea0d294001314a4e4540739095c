@@ -1,0 +1,19 @@
+import java.awt.Point;
+
+@SuppressWarnings("serial")
+public class Point2 extends Point
+{
+	public boolean isActor;
+	
+	public Point2(Point p, boolean isActor)
+	{
+		super(p);
+		this.isActor = isActor;
+	}
+
+	public Point2(int x, int y, boolean isActor)
+	{
+		super(x, y);
+		this.isActor = isActor;
+	}
+}

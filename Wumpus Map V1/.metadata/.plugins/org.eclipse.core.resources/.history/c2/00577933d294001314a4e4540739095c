@@ -1,0 +1,14 @@
+import java.awt.Point;
+
+public class Point2 extends Point
+{
+	public Point2(Point p)
+	{
+		super(p);
+	}
+
+	public Point2(int x, int y)
+	{
+		super(x, y);
+	}
+}

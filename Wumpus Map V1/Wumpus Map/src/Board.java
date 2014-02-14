@@ -19,47 +19,60 @@ public class Board
 	public int size;
 	
 	public HashMap<Point, GameObject> gameObjects;
-	public ArrayList<Point> emptyPoints;
 	
 	public Player player;
 	public Wumpus wumpus;
 	public Treasure treasure;
 	public CaveExit caveExit;
 	
+	//Constructor
 	public Board(int size, int totalDangers, int minFreeSpaceAroundDangers)
 	{
 		this.size = size;
 		
+		try
+		{
+			setupBoard(totalDangers, minFreeSpaceAroundDangers);
+		}
+		catch(BoardInvalidException e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	//Board setup
+	public void setupBoard(int totalDangers, int minFreeSpaceAroundDangers) throws BoardInvalidException
+	{
+		//Init main storage object
 		gameObjects = new HashMap<Point, GameObject>();
-		emptyPoints = new ArrayList<Point>();
 		
 		Point tempPoint;
 		
+		//Randomly assign number of Pits and Superbats based on a given number of total dangers
 		int currentPits = 0;
 		int totalPits = (int) (Math.random() * totalDangers + 1);
 		int currentBats = 0;
 		int totalBats = totalDangers - totalPits;
 		
+		//Fill the Board with Empty objects
 		for(int x = 0; x < size; x ++)
 		{
 			for(int y = 0; y < size; y ++)
 			{
 				tempPoint = new Point(x, y);
 				gameObjects.put(tempPoint, new Empty(tempPoint));
-				emptyPoints.add(tempPoint);
 			}
 		}
 		
 		try
 		{
+			//Replace random empty spaces with Pits and Superbats
 			while(currentPits < totalPits)
 			{
 				tempPoint = getRandomEmptyPoint(minFreeSpaceAroundDangers);
 				
 				gameObjects.remove(tempPoint);
 				gameObjects.put(tempPoint, new Pit(tempPoint));
-				
-				//emptyPoints.remove(tempPoint.x * size + tempPoint.y);
 				
 				currentPits ++;
 			}
@@ -71,11 +84,10 @@ public class Board
 				gameObjects.remove(tempPoint);
 				gameObjects.put(tempPoint, new Superbat(tempPoint));
 				
-				//emptyPoints.remove(tempPoint.x * size + tempPoint.y);
-				
 				currentBats ++;
 			}
 			
+			//Add player, wumpus, treasure, and cave exit to the board
 			player = new Player(getRandomEmptyPoint(1));
 			
 			wumpus = new Wumpus(getRandomEmptyPoint(1));
@@ -88,38 +100,56 @@ public class Board
 			gameObjects.remove(caveExit.position);
 			gameObjects.put(caveExit.position, caveExit);
 		}
-		catch(BoardInvalidException e)
+		catch(NoLegalPositionException e)
 		{
-			System.out.print("Board is invalid, terminating program.");
-			System.exit(0);
+			//Throw new exception if there were too many dangers and/or each danger required too much free space
+			throw new BoardInvalidException("Board cannot be set up with current parameters.");
 		}
 	}
+	
+	//UTILITY METHODS
 	
 	public GameObject getGameObject(Point position)
 	{
 		return gameObjects.get(position);
 	}
 	
+	//Utility methods for adding and subtracting points, then wrapping the new points to the torus shape of the board
 	public Point addPoints(Point p1, Point p2)
 	{
-		return new Point(p1.x + p2.x, p1.y + p2.y);
+		return new Point((p1.x + p2.x + size) % size, (p1.y + p2.y + size) % size);
 	}
 	
+	public Point subtractPoints(Point p1, Point p2)
+	{
+		return new Point((p1.x - p2.x % size + size) % size, (p1.y - p2.y % size + size) % size);
+	}
+	
+	public Point getRandomDirection()
+	{
+		return DIRECTIONS[(int) (Math.random() * Board.DIRECTIONS.length)];
+	}
+	
+	//Test if a certain position contains a certain type of object
 	public boolean isOccupant(Class<?> desiredOccupant, Point position)
 	{
 		return desiredOccupant.isInstance(gameObjects.get(position));
 	}
 	
+	//Get the number of a particular class of object surrounding a certain point
 	public int getSurrounding(Class<?> C, Point position)
 	{
 		int count = 0;
 		
 		for(Point currentPoint : DIRECTIONS)
 		{
-			if(C.isInstance(gameObjects.get(addPoints(position, currentPoint))))
+			if(isOccupant(C, addPoints(position, currentPoint)))
 			{
 				count ++;
 			}
+			//Special check for the wumpus, as it isn't actually in the gameObjects hashmap
+			//null check is required for when this method is called in the constructor
+			//before the wumpus is created
 			else if(wumpus != null && position.equals(wumpus.position))
 			{
 				count ++;
@@ -129,8 +159,10 @@ public class Board
 		return count;
 	}
 	
-	public Point getRandomEmptyPoint(int minFreeSpaceAround) throws BoardInvalidException
+	//Get a random empty point on the board
+	public Point getRandomEmptyPoint(int minFreeSpaceAround) throws NoLegalPositionException
 	{
+		//Create an array that contained the entire board but shuffled into a random order
 		ArrayList<GameObject> shuffledGameObjects = new ArrayList<GameObject>(gameObjects.values());
 		Collections.shuffle(shuffledGameObjects);
 		
@@ -141,6 +173,8 @@ public class Board
 		{
 			tempRandomObject = shuffledGameObjects.get(i);
 			
+			//If the current random point is empty and it is surrounded by at least
+			//the minimum amount of free space, then return that point
 			if(tempRandomObject instanceof Empty)
 			{
 				if(getSurrounding(Empty.class, tempRandomObject.position) >= minFreeSpaceAround)
@@ -153,9 +187,14 @@ public class Board
 		}
 		while(i < shuffledGameObjects.size());
 		
-		throw new BoardInvalidException("No more legal points on map.");
+		//If all positions on the board have been tested and deemed inviable,
+		//throw a new exception to let the caller know
+		throw new NoLegalPositionException("No more legal positions on map.");
 	}
 	
+	//GAMEPLAY METHODS
+	
+	//Get the warnings the player senses based on the objects surrounding the player
 	public int[] getPlayerTriggers()
 	{
 		int[] triggerArray = new int[5];
@@ -169,12 +208,14 @@ public class Board
 		return triggerArray;
 	}
 	
+	//Check what the play is currently standing on, and act accordingly
 	public String checkPlayerStatus()
 	{
 		GameObject standingOn = getGameObject(player.position);
 		
 		if(standingOn instanceof Pit)
 		{
+			System.out.println("You fell down a pit and died.");
 			return LOSE;
 		}
 		else if(standingOn instanceof Superbat)
@@ -183,30 +224,41 @@ public class Board
 			{
 				player.position = getRandomEmptyPoint(1);
 			}
-			catch(BoardInvalidException e)
+			catch(NoLegalPositionException e)
 			{
 				//do nothing?
 			}
+			System.out.println("A Superbat carried you off somewhere.");
 		}
 		else if(standingOn instanceof Treasure)
 		{
 			player.hasTreasure = true;
+			System.out.println("You collected the treasure.");
 		}
 		else if(standingOn instanceof CaveExit)
 		{
 			if(player.hasTreasure)
 			{
+				System.out.println("You escaped the cave with the treasure.");
 				return WIN;
 			}
+			System.out.println("You found the cave exit, but cannot leave without the treasure.");
 		}
 		else if(player.position.equals(wumpus.position))
 		{
+			System.out.println("The Wumpus killed you.");
 			return LOSE;
 		}
 		
 		return PLAYING;
 	}
 	
+	public void moveWumpus()
+	{
+		wumpus.move(getRandomDirection());
+	}
+	
+	//Method to give player and wumpus access to this board instance, required for move methods
 	public void link()
 	{
 		player.board = this;
