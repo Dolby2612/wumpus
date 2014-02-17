@@ -1,0 +1,54 @@
+import org.apache.commons.lang3.time.StopWatch;
+
+public class Main
+{
+
+	public static void main(String[] args)
+	{
+		//
+	}
+	
+	private static void playAIGame(AI ai, Board board, int visualDelay)
+	{
+		board.player = ai;
+		board.link();
+		
+		int turn = 0;
+		String aiStatus;
+		StopWatch stopwatch = new StopWatch();
+		stopwatch.start();
+		
+		do
+		{
+			if(stopwatch.getTime() >= turn * visualDelay)
+			{
+				turn ++;
+				ai.act();
+				aiStatus = board.checkPlayerStatus();
+			}
+		}
+		while(aiStatus.equals(Board.PLAYING));
+	}
+	
+	private static void playHumanGame(Board board)
+	{
+		board.link();
+		
+		String playerStatus, input;
+		
+		do
+		{
+			input = EasyIn.getString();
+			String[] inputSplit = input.split(" ");
+			
+			if(inputSplit[0].equals(" "))
+			{
+				if(inputSplit[1].toLowerCase().equals("n"))
+				{
+					board.player.shoot(Board.NORTH, 5);
+				}
+			}
+		}
+		while(playerStatus.equals(Board.PLAYING));
+	}
+}

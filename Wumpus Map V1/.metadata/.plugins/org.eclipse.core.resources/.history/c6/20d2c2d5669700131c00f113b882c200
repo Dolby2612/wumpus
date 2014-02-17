@@ -1,0 +1,102 @@
+import org.apache.commons.lang3.time.StopWatch;
+
+public class Main
+{
+
+	public static void main(String[] args)
+	{
+		String chooseGame = EasyIn.getString();
+		
+		if(chooseGame.equalsIgnoreCase("player"))
+		{
+			playHumanGame(gameBoard);
+		}
+		else if(chooseGame.equalsIgnoreCase("ai"))
+		{
+			playerAIGame(gameBoard);
+		}
+	}
+	
+	private static void playAIGame(AI ai, Board board, int visualDelay)
+	{
+		board.player = ai;
+		board.link();
+		
+		int turn = 0;
+		String aiStatus = Board.PLAYING;
+		StopWatch stopwatch = new StopWatch();
+		stopwatch.start();
+		
+		do
+		{
+			if(stopwatch.getTime() >= turn * visualDelay)
+			{
+				turn ++;
+				ai.act();
+				aiStatus = board.checkPlayerStatus();
+			}
+		}
+		while(aiStatus.equals(Board.PLAYING));
+	}
+	
+	private static void playHumanGame(Board board)
+	{
+		System.out.println("To move, enter the direction of desired travel: n, s , e, w");
+		System.out.println("To shoot, enter \"shoot\" followed by a direction, as for movement");
+		
+		board.link();
+		
+		String playerStatus = Board.PLAYING, input;
+		
+		do
+		{
+			System.out.println(board.player.getSenses(board.getPlayerTriggers()));
+			
+			input = EasyIn.getString();
+			String[] inputSplit = input.split(" ");
+			
+			if(inputSplit[0].equalsIgnoreCase("shoot"))
+			{
+				if(inputSplit[1].equalsIgnoreCase("n"))
+				{
+					board.player.shoot(Board.NORTH, 5);
+				}
+				else if(inputSplit[1].equalsIgnoreCase("s"))
+				{
+					board.player.shoot(Board.SOUTH, 5);
+				}
+				else if(inputSplit[1].equalsIgnoreCase("e"))
+				{
+					board.player.shoot(Board.EAST, 5);
+				}
+				else if(inputSplit[1].equalsIgnoreCase("w"))
+				{
+					board.player.shoot(Board.WEST, 5);
+				}
+			}
+			else if(inputSplit[0].equalsIgnoreCase("n"))
+			{
+				board.player.move(Board.NORTH);
+			}
+			else if(inputSplit[0].equalsIgnoreCase("s"))
+			{
+				board.player.move(Board.NORTH);
+			}
+			else if(inputSplit[0].equalsIgnoreCase("e"))
+			{
+				board.player.move(Board.NORTH);
+			}
+			else if(inputSplit[0].equalsIgnoreCase("w"))
+			{
+				board.player.move(Board.NORTH);
+			}
+			else
+			{
+				System.out.println("Input invalid");
+			}
+			
+			playerStatus = board.checkPlayerStatus();
+		}
+		while(playerStatus.equals(Board.PLAYING));
+	}
+}
